@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestParam
 import jakarta.websocket.server.PathParam
 
 @SpringBootApplication class ChallengeBackendApplication
@@ -127,6 +128,39 @@ class PlanetaController(val db: JdbcTemplate) {
                 var planeta = db.queryForObject(
                 "SELECT * FROM planetas WHERE id = ?",
                 id) {p , _ -> 
+                        Planeta(
+                                p.getInt("id"),
+                                p.getString("nome"),
+                                p.getString("clima"),
+                                p.getString("terreno")
+                        )
+                }
+
+                if(planeta is null) {
+                        return ResponseEntity(
+                                Response(message = "planeta nao existe", body = null, status = 404),
+                                HttpStatus.BAD_REQUEST
+                        )
+                }
+
+                return ResponseEntity(
+                        Response(message = "", body = planeta, status = 204),
+                        HttpStatus.NO_CONTENT
+                )
+        }
+
+        @GetMapping("/planetas")
+        fun listarPorNome(@RequestParam nome: String): ResponseEntity<Response> {
+                if(nome.isNullOrBlank()) {
+                        return ResponseEntity(
+                                Response(message = "nome invalido", body = null, status = 400),
+                                HttpStatus.BAD_REQUEST
+                        )
+                }
+
+                var planeta = db.queryForObject(
+                "SELECT * FROM planetas WHERE nome = ?",
+                nome) {p , _ -> 
                         Planeta(
                                 p.getInt("id"),
                                 p.getString("nome"),
