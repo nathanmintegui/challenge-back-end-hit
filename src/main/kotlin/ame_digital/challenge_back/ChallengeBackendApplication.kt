@@ -42,51 +42,37 @@ class PlanetaController(val db: JdbcTemplate) {
         @PostMapping("/planetas")
         fun inserir(@RequestBody request: CriarPlanetaRequest): ResponseEntity<Response> {
                 if (request.nome.isNullOrEmpty()) {
-                        val responseBody =
-                                        Response(
-                                                        message = "campo nome é obrigatório",
-                                                        body = null,
-                                                        status = 400
-                                        )
-
-                        return ResponseEntity(responseBody, HttpStatus.BAD_REQUEST)
+                        return ResponseEntity(
+                                Response(message = "campo nome é obrigatorio", body = null, status = 400),
+                                HttpStatus.BAD_REQUEST
+                        )
                 }
 
                 if (request.clima.isNullOrEmpty()) {
-                        val responseBody =
-                                        Response(
-                                                        message = "campo clima é obrigatório",
-                                                        body = null,
-                                                        status = 400
-                                        )
-
-                        return ResponseEntity(responseBody, HttpStatus.BAD_REQUEST)
+                        return ResponseEntity(
+                                Response(message = "campo clima é obrigatorio", body = null, status = 400),
+                                HttpStatus.BAD_REQUEST
+                        )
                 }
 
                 if (request.terreno.isNullOrEmpty()) {
-                        val responseBody =
-                                        Response(
-                                                        message = "campo terreno é obrigatório",
-                                                        body = null,
-                                                        status = 400
- 
-                                                )
-                        return ResponseEntity(responseBody, HttpStatus.BAD_REQUEST)
-                }
-
-                try {
-                        db.update(
-                                        "insert into planetas values(?,?,?)",
-                                        request.nome,
-                                        request.clima,
-                                        request.terreno
+                        return ResponseEntity(
+                                Response(message = "campo terreno e obrigatorio", body = null, status = 400),
+                                HttpStatus.BAD_REQUEST
                         )
-                } catch(e) {
-                        // TODO: Error Handleing 
                 }
 
-                val res = Response(message = "criado com sucesso", body = null, status = 200)
-                return ResponseEntity(res, HttpStatus.OK)
+                db.update(
+                        "insert into planetas values(?,?,?)",
+                        request.nome,
+                        request.clima,
+                        request.terreno
+                )
+
+                return ResponseEntity(
+                        Response(message = "criado com sucesso", body = null, status = 200),
+                        HttpStatus.OK
+                )
         }
 
         @DeleteMapping("/planetas/{id}")
